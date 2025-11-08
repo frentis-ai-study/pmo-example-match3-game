@@ -402,6 +402,25 @@ export class GameScreen {
   }
 
   /**
+   * 디버그/테스트용 getter 메서드
+   */
+  getGameState(): GameState {
+    return this.gameState;
+  }
+
+  getGrid(): Grid {
+    return this.grid;
+  }
+
+  getPauseScreen(): PauseScreen {
+    return this.pauseScreen;
+  }
+
+  getGameOverScreen(): GameOverScreen {
+    return this.gameOverScreen;
+  }
+
+  /**
    * 정리
    */
   destroy(): void {
