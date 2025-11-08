@@ -110,6 +110,19 @@ export class Grid {
   }
 
   /**
+   * 전체 그리드 상태 설정 (저장된 게임 복구용)
+   */
+  setGridState(grid: (BlockType | null)[][]): void {
+    if (grid.length !== this.rows || grid[0]?.length !== this.cols) {
+      Logger.warn('Grid size mismatch, cannot restore state');
+      return;
+    }
+
+    this.blocks = grid.map((row) => [...row]);
+    Logger.info('Grid state restored');
+  }
+
+  /**
    * 위치가 유효한지 확인
    */
   private isValidPosition(pos: Position): boolean {

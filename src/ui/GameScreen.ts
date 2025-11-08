@@ -6,6 +6,9 @@ import { ScoreCalculator } from '../game/ScoreCalculator';
 import { Renderer } from '../rendering/Renderer';
 import { AnimationController } from '../rendering/AnimationController';
 import { InputHandler } from '../rendering/InputHandler';
+import { PauseScreen } from './PauseScreen';
+import { GameOverScreen } from './GameOverScreen';
+import { StorageManager } from '../storage/StorageManager';
 import type { Position } from '../types';
 import Logger from '../utils/Logger';
 import EventBus from '../utils/EventBus';
@@ -16,6 +19,7 @@ import EventBus from '../utils/EventBus';
  * 모든 게임 로직과 렌더링을 통합합니다.
  */
 export class GameScreen {
+  private app: Application;
   private grid: Grid;
   private gameState: GameState;
   private matchDetector: MatchDetector;
@@ -23,10 +27,14 @@ export class GameScreen {
   private renderer: Renderer;
   private animationController: AnimationController;
   private inputHandler: InputHandler;
+  private pauseScreen: PauseScreen;
+  private gameOverScreen: GameOverScreen;
   private scoreText: Text | null = null;
+  private pauseButton: Text | null = null;
   private isProcessing: boolean = false;
 
   constructor(app: Application) {
+    this.app = app;
 
     // 게임 로직 초기화
     this.grid = new Grid();
@@ -47,8 +55,21 @@ export class GameScreen {
       this.renderer.getGridPadding()
     );
 
+    // UI 화면 초기화
+    this.pauseScreen = new PauseScreen(app.screen.width, app.screen.height);
+    this.gameOverScreen = new GameOverScreen(app.screen.width, app.screen.height);
+
+    // UI 컨테이너에 추가
+    app.stage.addChild(this.pauseScreen.getContainer());
+    app.stage.addChild(this.gameOverScreen.getContainer());
+
+    // 초기에는 숨김
+    this.pauseScreen.hide();
+    this.gameOverScreen.hide();
+
     this.setupEventListeners();
     this.setupUI();
+    this.setupScreenCallbacks();
 
     Logger.info('GameScreen initialized');
   }
@@ -72,14 +93,73 @@ export class GameScreen {
   private setupUI(): void {
     // 점수 표시
     this.scoreText = this.renderer.renderText('Score: 0', 20, 20, 32);
+
+    // 일시정지 버튼
+    this.pauseButton = this.renderer.renderText(
+      'Pause',
+      this.app.screen.width - 100,
+      20,
+      28
+    );
+    this.pauseButton.eventMode = 'static';
+    this.pauseButton.cursor = 'pointer';
+    this.pauseButton.on('pointerdown', () => {
+      this.togglePause();
+    });
+  }
+
+  /**
+   * 화면 콜백 설정
+   */
+  private setupScreenCallbacks(): void {
+    // 일시정지 화면 콜백
+    this.pauseScreen.onResume(() => {
+      this.resume();
+    });
+
+    this.pauseScreen.onRestart(() => {
+      this.pauseScreen.hide();
+      this.restart();
+    });
+
+    // 게임 오버 화면 콜백
+    this.gameOverScreen.onRestart(() => {
+      this.gameOverScreen.hide();
+      this.restart();
+    });
+  }
+
+  /**
+   * 일시정지 토글
+   */
+  private togglePause(): void {
+    if (this.gameState.phase === 'playing') {
+      this.pause();
+    } else if (this.gameState.phase === 'paused') {
+      this.resume();
+    }
   }
 
   /**
    * 게임 시작
    */
   start(): void {
-    this.gameState.start();
+    // 저장된 게임 상태 확인
+    if (StorageManager.hasSave()) {
+      const savedState = StorageManager.load();
+      if (savedState) {
+        this.gameState.fromData(savedState);
+        this.grid.setGridState(savedState.grid);
+        Logger.info('Restored game from save');
+      }
+    }
+
+    if (this.gameState.phase === 'idle') {
+      this.gameState.start();
+    }
+
     this.renderGame();
+    this.updateScoreDisplay(this.gameState.score);
 
     Logger.info('Game started');
   }
@@ -239,6 +319,12 @@ export class GameScreen {
   pause(): void {
     this.gameState.pause();
     this.inputHandler.disable();
+    this.pauseScreen.show();
+
+    // 게임 상태 저장
+    this.saveGameState();
+
+    Logger.info('Game paused');
   }
 
   /**
@@ -247,6 +333,9 @@ export class GameScreen {
   resume(): void {
     this.gameState.resume();
     this.inputHandler.enable();
+    this.pauseScreen.hide();
+
+    Logger.info('Game resumed');
   }
 
   /**
@@ -255,6 +344,12 @@ export class GameScreen {
   gameOver(): void {
     this.gameState.gameOver();
     this.inputHandler.disable();
+    this.gameOverScreen.show(this.gameState.score);
+
+    // 저장된 게임 상태 삭제
+    StorageManager.clear();
+
+    Logger.info('Game over', { finalScore: this.gameState.score });
   }
 
   /**
@@ -264,8 +359,23 @@ export class GameScreen {
     this.grid.reset();
     this.gameState.reset();
     this.animationController.cancelAll();
+
+    // 저장된 게임 상태 삭제
+    StorageManager.clear();
+
     this.renderGame();
     this.start();
+
+    Logger.info('Game restarted');
+  }
+
+  /**
+   * 게임 상태 저장
+   */
+  private saveGameState(): void {
+    this.gameState.setGridState(this.grid.getAllBlocks());
+    const stateData = this.gameState.toData();
+    StorageManager.save(stateData);
   }
 
   /**
@@ -274,6 +384,8 @@ export class GameScreen {
   destroy(): void {
     this.inputHandler.destroy();
     this.renderer.destroy();
+    this.pauseScreen.destroy();
+    this.gameOverScreen.destroy();
     EventBus.removeAllListeners();
 
     Logger.info('GameScreen destroyed');
