@@ -1,6 +1,6 @@
 import { Application } from 'pixi.js';
 import Logger from './utils/Logger';
-import EventBus from './utils/EventBus';
+import { GameScreen } from './ui/GameScreen';
 
 /**
  * 게임 메인 진입점
@@ -17,7 +17,7 @@ async function main() {
     // PixiJS 초기화
     await app.init({
       width: 800,
-      height: 600,
+      height: 700,
       backgroundColor: 0x1a1a2e,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
@@ -36,27 +36,14 @@ async function main() {
       height: app.screen.height,
     });
 
-    // 게임 시작 이벤트 발행
-    EventBus.emit({ type: 'gameStarted' });
-
-    // 임시: 간단한 텍스트 표시
-    const { Text } = await import('pixi.js');
-    const text = new Text({
-      text: 'Match-3 Game\nComing Soon...',
-      style: {
-        fontFamily: 'Arial',
-        fontSize: 48,
-        fill: 0xffffff,
-        align: 'center',
-      },
-    });
-
-    text.anchor.set(0.5);
-    text.x = app.screen.width / 2;
-    text.y = app.screen.height / 2;
-    app.stage.addChild(text);
+    // GameScreen 생성 및 시작
+    const gameScreen = new GameScreen(app);
+    gameScreen.start();
 
     Logger.info('Game started successfully');
+
+    // 전역 변수로 노출 (디버깅용)
+    (window as any).gameScreen = gameScreen;
   } catch (error) {
     Logger.error('Failed to initialize game', error);
     throw error;
