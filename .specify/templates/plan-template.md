@@ -31,7 +31,30 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### I. 단순성 우선 (Simplicity First / YAGNI)
+- [ ] 현재 요구사항에 필요한 기능만 포함되었는가?
+- [ ] 프론트엔드 전용 게임으로, 백엔드/서버 로직이 없는가?
+- [ ] 로컬 스토리지나 브라우저 API만으로 데이터 관리가 가능한가?
+- [ ] 불필요한 추상화가 포함되지 않았는가?
+- [ ] 새로운 의존성이 명확한 가치를 제공하는가?
+- [ ] 복잡성 증가가 Complexity Tracking에 문서화되었는가?
+
+### II. 실용적 테스트 (Pragmatic Testing)
+- [ ] 핵심 게임 로직(매칭, 점수, 상태 전이)에 대한 테스트 계획이 있는가?
+- [ ] 로컬 스토리지 처리 테스트가 포함되었는가?
+- [ ] 테스트 범위가 ROI를 고려하여 적절한가?
+
+### III. 성능과 반응성 (Performance & Responsiveness)
+- [ ] 60fps 렌더링 목표가 고려되었는가?
+- [ ] 사용자 입력 반응성(100ms 이내)이 설계에 반영되었는가?
+- [ ] 초기 로딩 시간(3초 이내) 목표가 있는가?
+- [ ] 리소스 정리 및 메모리 관리 계획이 있는가?
+- [ ] 다양한 디바이스/브라우저 호환성이 고려되었는가?
+
+### IV. 관찰 가능성 (Observability)
+- [ ] 구조화된 로깅 전략이 정의되었는가?
+- [ ] 주요 게임 이벤트 추적 계획이 있는가?
+- [ ] 디버그 모드 및 에러 리포팅 전략이 있는가?
 
 ## Project Structure
 
