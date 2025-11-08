@@ -8,6 +8,7 @@ import { AnimationController } from '../rendering/AnimationController';
 import { InputHandler } from '../rendering/InputHandler';
 import { PauseScreen } from './PauseScreen';
 import { GameOverScreen } from './GameOverScreen';
+import { ComboCounter } from './ComboCounter';
 import { StorageManager } from '../storage/StorageManager';
 import type { Position } from '../types';
 import Logger from '../utils/Logger';
@@ -29,8 +30,10 @@ export class GameScreen {
   private inputHandler: InputHandler;
   private pauseScreen: PauseScreen;
   private gameOverScreen: GameOverScreen;
+  private comboCounter: ComboCounter;
   private scoreText: Text | null = null;
   private pauseButton: Text | null = null;
+  private movesText: Text | null = null;
   private isProcessing: boolean = false;
 
   constructor(app: Application) {
@@ -58,10 +61,12 @@ export class GameScreen {
     // UI 화면 초기화
     this.pauseScreen = new PauseScreen(app.screen.width, app.screen.height);
     this.gameOverScreen = new GameOverScreen(app.screen.width, app.screen.height);
+    this.comboCounter = new ComboCounter(app.screen.width / 2, app.screen.height / 2 - 150);
 
     // UI 컨테이너에 추가
     app.stage.addChild(this.pauseScreen.getContainer());
     app.stage.addChild(this.gameOverScreen.getContainer());
+    app.stage.addChild(this.comboCounter.getContainer());
 
     // 초기에는 숨김
     this.pauseScreen.hide();
@@ -85,6 +90,11 @@ export class GameScreen {
     EventBus.on('scoreUpdated', (event) => {
       this.updateScoreDisplay(event.score);
     });
+
+    // 콤보 이벤트
+    EventBus.on('comboDetected', (event) => {
+      this.comboCounter.update(event.comboCount);
+    });
   }
 
   /**
@@ -93,6 +103,9 @@ export class GameScreen {
   private setupUI(): void {
     // 점수 표시
     this.scoreText = this.renderer.renderText('Score: 0', 20, 20, 32);
+
+    // 이동 횟수 표시
+    this.movesText = this.renderer.renderText('Moves: 0', 20, 60, 24);
 
     // 일시정지 버튼
     this.pauseButton = this.renderer.renderText(
@@ -219,6 +232,7 @@ export class GameScreen {
 
       // 이동 횟수 증가
       this.gameState.incrementMoves();
+      this.updateMovesDisplay(this.gameState.moves);
 
       // 콤보 초기화 (첫 매칭)
       this.gameState.resetCombo();
@@ -314,6 +328,15 @@ export class GameScreen {
   }
 
   /**
+   * 이동 횟수 표시 업데이트
+   */
+  private updateMovesDisplay(moves: number): void {
+    if (this.movesText) {
+      this.movesText.text = `Moves: ${moves}`;
+    }
+  }
+
+  /**
    * 게임 일시정지
    */
   pause(): void {
@@ -386,6 +409,7 @@ export class GameScreen {
     this.renderer.destroy();
     this.pauseScreen.destroy();
     this.gameOverScreen.destroy();
+    this.comboCounter.destroy();
     EventBus.removeAllListeners();
 
     Logger.info('GameScreen destroyed');
