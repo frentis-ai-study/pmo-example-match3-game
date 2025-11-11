@@ -12,6 +12,7 @@ export class Renderer {
   private uiContainer: Container;
   private blockSize: number = 60;
   private gridPadding: number = 10;
+  private selectionHighlight: Graphics | null = null;
 
   // 블록 색상 매핑
   private blockColors: Record<BlockType, number> = {
@@ -177,9 +178,53 @@ export class Renderer {
   }
 
   /**
+   * 선택된 블록 하이라이트 표시
+   */
+  showSelectionHighlight(row: number, col: number): void {
+    // 기존 하이라이트 제거
+    this.clearSelectionHighlight();
+
+    const x = col * (this.blockSize + this.gridPadding);
+    const y = row * (this.blockSize + this.gridPadding);
+
+    this.selectionHighlight = new Graphics();
+
+    // 노란색 테두리로 선택 표시
+    this.selectionHighlight.lineStyle(4, 0xffff00, 1);
+    this.selectionHighlight.drawRoundedRect(-2, -2, this.blockSize + 4, this.blockSize + 4, 10);
+
+    // 반투명 노란색 오버레이
+    this.selectionHighlight.beginFill(0xffff00, 0.2);
+    this.selectionHighlight.drawRoundedRect(0, 0, this.blockSize, this.blockSize, 8);
+    this.selectionHighlight.endFill();
+
+    this.selectionHighlight.x = x;
+    this.selectionHighlight.y = y;
+
+    // 최상위에 표시 (eventMode는 none으로 설정하여 클릭 방해하지 않음)
+    this.selectionHighlight.eventMode = 'none';
+    this.gridContainer.addChild(this.selectionHighlight);
+
+    Logger.debug('Selection highlight shown', { row, col });
+  }
+
+  /**
+   * 선택 하이라이트 제거
+   */
+  clearSelectionHighlight(): void {
+    if (this.selectionHighlight) {
+      this.gridContainer.removeChild(this.selectionHighlight);
+      this.selectionHighlight.destroy();
+      this.selectionHighlight = null;
+      Logger.debug('Selection highlight cleared');
+    }
+  }
+
+  /**
    * 렌더러 정리
    */
   destroy(): void {
+    this.clearSelectionHighlight();
     this.gridContainer.destroy({ children: true });
     this.uiContainer.destroy({ children: true });
     Logger.info('Renderer destroyed');

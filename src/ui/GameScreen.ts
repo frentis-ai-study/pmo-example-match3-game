@@ -86,6 +86,17 @@ export class GameScreen {
     // 스와이프 이벤트
     this.inputHandler.onSwipe(this.handleSwipe.bind(this));
 
+    // 선택 변경 이벤트 (클릭-클릭 방식)
+    this.inputHandler.onSelectionChange((selected) => {
+      if (selected) {
+        // 블록이 선택되면 하이라이트 표시
+        this.renderer.showSelectionHighlight(selected.row, selected.col);
+      } else {
+        // 선택 해제되면 하이라이트 제거
+        this.renderer.clearSelectionHighlight();
+      }
+    });
+
     // 점수 업데이트 이벤트
     EventBus.on('scoreUpdated', (event) => {
       this.updateScoreDisplay(event.score);

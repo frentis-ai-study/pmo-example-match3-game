@@ -4,19 +4,21 @@ import Logger from '../utils/Logger';
 
 /**
  * InputHandler
- * 마우스/터치 입력을 처리하고 스와이프를 감지합니다.
+ * 마우스/터치 입력을 처리하고 스와이프 및 클릭-클릭 방식을 지원합니다.
  */
 export class InputHandler {
   private container: Container;
   private isDragging: boolean = false;
   private startBlock: { row: number; col: number } | null = null;
+  private selectedBlock: { row: number; col: number } | null = null;
   private onSwipeCallback: ((from: Position, to: Position) => void) | null = null;
+  private onSelectionChangeCallback: ((selected: Position | null) => void) | null = null;
 
   constructor(container: Container, _blockSize: number, _gridPadding: number) {
     this.container = container;
 
     this.setupListeners();
-    Logger.info('InputHandler initialized');
+    Logger.info('InputHandler initialized (supports drag and click-click)');
   }
 
   /**
@@ -63,10 +65,16 @@ export class InputHandler {
         col: endBlock.blockCol,
       };
 
-      // 시작 블록과 다른 블록이면 스와이프로 간주
+      // 드래그 앤 드롭: 시작 블록과 다른 블록이면 스와이프로 간주
       if (this.startBlock.row !== endPos.row || this.startBlock.col !== endPos.col) {
         this.handleSwipe(this.startBlock, endPos);
+        this.isDragging = false;
+        this.startBlock = null;
+        return;
       }
+
+      // 클릭-클릭: 같은 위치에서 pointerdown과 pointerup이 발생한 경우
+      this.handleClick(endPos);
     }
 
     this.isDragging = false;
@@ -83,6 +91,70 @@ export class InputHandler {
 
     // 드래그 중 시각적 피드백을 추가할 수 있음
     // 현재는 기본 구현만 제공
+  }
+
+  /**
+   * 클릭 처리 (클릭-클릭 방식)
+   */
+  private handleClick(clickedPos: Position): void {
+    // 선택된 블록이 없으면 블록 선택
+    if (!this.selectedBlock) {
+      this.selectedBlock = { ...clickedPos };
+      Logger.info('Block selected', this.selectedBlock);
+
+      // 선택 변경 콜백 호출
+      if (this.onSelectionChangeCallback) {
+        this.onSelectionChangeCallback(this.selectedBlock);
+      }
+      return;
+    }
+
+    // 같은 블록을 다시 클릭하면 선택 취소
+    if (
+      this.selectedBlock.row === clickedPos.row &&
+      this.selectedBlock.col === clickedPos.col
+    ) {
+      Logger.info('Block deselected', this.selectedBlock);
+      this.selectedBlock = null;
+
+      // 선택 변경 콜백 호출
+      if (this.onSelectionChangeCallback) {
+        this.onSelectionChangeCallback(null);
+      }
+      return;
+    }
+
+    // 인접한 블록인지 확인
+    const rowDiff = Math.abs(this.selectedBlock.row - clickedPos.row);
+    const colDiff = Math.abs(this.selectedBlock.col - clickedPos.col);
+    const isAdjacent = (rowDiff === 0 && colDiff === 1) || (rowDiff === 1 && colDiff === 0);
+
+    if (isAdjacent) {
+      // 인접한 블록이면 스왑 실행
+      Logger.info('Adjacent block clicked, swapping', {
+        from: this.selectedBlock,
+        to: clickedPos,
+      });
+
+      if (this.onSwipeCallback) {
+        this.onSwipeCallback(this.selectedBlock, clickedPos);
+      }
+
+      // 선택 해제
+      this.selectedBlock = null;
+      if (this.onSelectionChangeCallback) {
+        this.onSelectionChangeCallback(null);
+      }
+    } else {
+      // 인접하지 않은 블록이면 새로운 블록 선택
+      Logger.info('Non-adjacent block clicked, changing selection', clickedPos);
+      this.selectedBlock = { ...clickedPos };
+
+      // 선택 변경 콜백 호출
+      if (this.onSelectionChangeCallback) {
+        this.onSelectionChangeCallback(this.selectedBlock);
+      }
+    }
   }
 
   /**
@@ -116,10 +188,38 @@ export class InputHandler {
   }
 
   /**
+   * 선택 변경 콜백 등록
+   */
+  onSelectionChange(callback: (selected: Position | null) => void): void {
+    this.onSelectionChangeCallback = callback;
+  }
+
+  /**
+   * 현재 선택된 블록 가져오기
+   */
+  getSelectedBlock(): Position | null {
+    return this.selectedBlock ? { ...this.selectedBlock } : null;
+  }
+
+  /**
+   * 선택 해제
+   */
+  clearSelection(): void {
+    if (this.selectedBlock) {
+      Logger.debug('Selection cleared');
+      this.selectedBlock = null;
+      if (this.onSelectionChangeCallback) {
+        this.onSelectionChangeCallback(null);
+      }
+    }
+  }
+
+  /**
    * 입력 비활성화
    */
   disable(): void {
     this.container.eventMode = 'none';
+    this.clearSelection(); // 입력 비활성화 시 선택도 해제
     Logger.debug('InputHandler disabled');
   }
 
