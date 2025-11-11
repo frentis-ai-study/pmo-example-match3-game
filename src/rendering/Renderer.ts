@@ -110,6 +110,8 @@ export class Renderer {
     background.drawRoundedRect(4, 4, this.blockSize - 8, this.blockSize / 2 - 4, 8);
     background.endFill();
 
+    // 배경은 이벤트를 받지 않도록 설정
+    background.eventMode = 'none';
     blockContainer.addChild(background);
 
     // 이모지 텍스트
@@ -120,7 +122,12 @@ export class Renderer {
     emoji.anchor.set(0.5);
     emoji.x = this.blockSize / 2;
     emoji.y = this.blockSize / 2;
+    emoji.eventMode = 'none'; // 이모지는 이벤트를 받지 않도록
     blockContainer.addChild(emoji);
+
+    // 블록 컨테이너는 이벤트를 받도록 설정
+    blockContainer.eventMode = 'static';
+    blockContainer.cursor = 'pointer';
 
     // 데이터 저장 (나중에 입력 처리에 사용)
     (blockContainer as any).blockRow = row;
@@ -145,7 +152,7 @@ export class Renderer {
     slot.endFill();
 
     // 테두리
-    slot.lineStyle(1, 0x2d3561, 0.8);
+    slot.setStrokeStyle({ width: 1, color: 0x2d3561, alpha: 0.8 });
     slot.drawRoundedRect(1, 1, this.blockSize - 2, this.blockSize - 2, 11);
 
     slot.x = x;
@@ -224,7 +231,7 @@ export class Renderer {
     this.selectionHighlight = new Graphics();
 
     // 노란색 테두리로 선택 표시
-    this.selectionHighlight.lineStyle(4, 0xffff00, 1);
+    this.selectionHighlight.setStrokeStyle({ width: 4, color: 0xffff00, alpha: 1 });
     this.selectionHighlight.drawRoundedRect(-2, -2, this.blockSize + 4, this.blockSize + 4, 10);
 
     // 반투명 노란색 오버레이

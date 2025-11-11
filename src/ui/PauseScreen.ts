@@ -85,7 +85,7 @@ export class PauseScreen {
     bg.drawRoundedRect(-100, -25, 200, 50, 10);
     bg.endFill();
 
-    bg.lineStyle(2, 0xffffff);
+    bg.setStrokeStyle({ width: 2, color: 0xffffff });
     bg.drawRoundedRect(-100, -25, 200, 50, 10);
 
     button.addChild(bg);

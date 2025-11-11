@@ -117,7 +117,7 @@ export class GameOverScreen {
     bg.endFill();
 
     // 버튼 테두리
-    bg.lineStyle(3, 0xffffff, 0.8);
+    bg.setStrokeStyle({ width: 3, color: 0xffffff, alpha: 0.8 });
     bg.drawRoundedRect(-140, -30, 280, 60, 15);
 
     // 하이라이트 효과

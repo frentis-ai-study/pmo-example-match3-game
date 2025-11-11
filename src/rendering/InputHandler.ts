@@ -27,7 +27,6 @@ export class InputHandler {
   private setupListeners(): void {
     // 마우스/터치 이벤트
     this.container.eventMode = 'static';
-    this.container.cursor = 'pointer';
     this.container.on('pointerdown', this.onPointerDown.bind(this));
     this.container.on('pointerup', this.onPointerUp.bind(this));
     this.container.on('pointermove', this.onPointerMove.bind(this));
