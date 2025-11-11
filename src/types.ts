@@ -22,10 +22,17 @@ export interface Position {
 export type GamePhase = 'idle' | 'playing' | 'paused' | 'gameover';
 
 /**
+ * 매칭 방향
+ */
+export type MatchDirection = 'horizontal' | 'vertical';
+
+/**
  * 매칭 결과
  */
 export interface MatchResult {
   blocks: Position[];
+  type: BlockType;
+  direction: MatchDirection;
   score: number;
   isCombo: boolean;
   comboCount?: number;

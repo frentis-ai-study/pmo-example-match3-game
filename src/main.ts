@@ -54,6 +54,13 @@ async function main() {
       antialias: true,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
+      eventMode: 'static',
+      eventFeatures: {
+        move: true,
+        globalMove: true,
+        click: true,
+        wheel: true,
+      },
     });
 
     // Canvas를 DOM에 추가
@@ -63,6 +70,11 @@ async function main() {
     }
 
     appContainer.appendChild(app.canvas);
+
+    // Stage가 이벤트를 받을 수 있도록 설정
+    app.stage.eventMode = 'static';
+    app.stage.hitArea = app.screen;
+
     Logger.info('PixiJS Application initialized', {
       width: app.screen.width,
       height: app.screen.height,

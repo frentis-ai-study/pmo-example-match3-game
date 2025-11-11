@@ -20,11 +20,10 @@ export class StartScene extends Scene {
 
     console.log('Screen dimensions:', { width, height });
 
-    // 배경
+    // 배경 (이벤트를 받지 않고 통과시킴)
     const bg = new Graphics();
-    bg.beginFill(0x000000, 0.8);
-    bg.drawRect(0, 0, width, height);
-    bg.endFill();
+    bg.rect(0, 0, width, height);
+    bg.fill({ color: 0x000000, alpha: 0.8 });
     bg.eventMode = 'none';
     this.container.addChild(bg);
 
@@ -113,14 +112,16 @@ export class StartScene extends Scene {
 
     // 배경
     const bg = new Graphics();
-    bg.beginFill(0x4caf50);
-    bg.drawRoundedRect(-120, -30, 240, 60, 15);
-    bg.endFill();
-    bg.setStrokeStyle({ width: 3, color: 0xffffff, alpha: 0.8 });
-    bg.drawRoundedRect(-120, -30, 240, 60, 15);
-    bg.beginFill(0xffffff, 0.2);
-    bg.drawRoundedRect(-115, -25, 230, 25, 12);
-    bg.endFill();
+    // 메인 배경
+    bg.roundRect(-120, -30, 240, 60, 15);
+    bg.fill(0x4caf50);
+    // 테두리
+    bg.roundRect(-120, -30, 240, 60, 15);
+    bg.stroke({ width: 3, color: 0xffffff, alpha: 0.8 });
+    // 하이라이트
+    bg.roundRect(-115, -25, 230, 25, 12);
+    bg.fill({ color: 0xffffff, alpha: 0.2 });
+
     bg.eventMode = 'none';
     button.addChild(bg);
 
@@ -140,10 +141,15 @@ export class StartScene extends Scene {
 
     button.x = x;
     button.y = y;
+
+    // 이벤트 설정: 버튼 컨테이너가 직접 이벤트를 받음
     button.eventMode = 'static';
     button.cursor = 'pointer';
 
-    console.log('Setting up button events...');
+    console.log('Setting up button events...', {
+      eventMode: button.eventMode,
+      cursor: button.cursor
+    });
 
     button.on('pointerdown', () => {
       console.log('***** BUTTON POINTERDOWN *****');
@@ -163,6 +169,10 @@ export class StartScene extends Scene {
       console.log('***** BUTTON HOVER OUT *****');
       button.scale.set(1);
       bg.tint = 0xffffff;
+    });
+
+    button.on('pointertap', () => {
+      console.log('***** BUTTON TAP *****');
     });
 
     console.log('Button events registered');

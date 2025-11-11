@@ -11,8 +11,8 @@ export abstract class Scene {
   constructor(app: Application) {
     this.app = app;
     this.container = new Container();
-    // 컨테이너는 이벤트를 받지 않도록 (자식들만 이벤트 처리)
-    this.container.eventMode = 'none';
+    // 씬 컨테이너는 이벤트를 받아서 자식에게 전달
+    this.container.eventMode = 'passive';
   }
 
   /**

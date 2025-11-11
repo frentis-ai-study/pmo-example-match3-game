@@ -41,11 +41,11 @@ export class Renderer {
     this.gridContainer = new Container();
     this.uiContainer = new Container();
 
-    // UI 컨테이너는 이벤트를 받지 않도록 (자식들만 이벤트 처리)
-    this.uiContainer.eventMode = 'none';
+    // Grid 컨테이너는 이벤트를 받아서 자식에게 전달
+    this.gridContainer.eventMode = 'passive';
 
-    this.app.stage.addChild(this.gridContainer);
-    this.app.stage.addChild(this.uiContainer);
+    // UI 컨테이너도 이벤트를 받아서 자식에게 전달 (pause 버튼 등)
+    this.uiContainer.eventMode = 'passive';
 
     Logger.info('Renderer initialized');
   }
@@ -128,11 +128,11 @@ export class Renderer {
     emoji.eventMode = 'none'; // 이모지는 이벤트를 받지 않도록
     blockContainer.addChild(emoji);
 
-    // 블록 컨테이너는 이벤트를 받도록 설정
+    // 블록 컨테이너는 클릭 가능하도록 설정
     blockContainer.eventMode = 'static';
     blockContainer.cursor = 'pointer';
 
-    // 데이터 저장 (나중에 입력 처리에 사용)
+    // 데이터 저장 (입력 처리에 사용)
     (blockContainer as any).blockRow = row;
     (blockContainer as any).blockCol = col;
     (blockContainer as any).blockType = type;

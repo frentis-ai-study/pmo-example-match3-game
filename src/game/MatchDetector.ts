@@ -39,6 +39,8 @@ export class MatchDetector {
             }
             matches.push({
               blocks: matchBlocks,
+              type: previous,
+              direction: 'horizontal',
               score: 0, // ScoreCalculator에서 계산
               isCombo: false,
             });
@@ -72,6 +74,8 @@ export class MatchDetector {
             if (matchBlocks.length >= 3) {
               matches.push({
                 blocks: matchBlocks,
+                type: previous,
+                direction: 'vertical',
                 score: 0,
                 isCombo: false,
               });

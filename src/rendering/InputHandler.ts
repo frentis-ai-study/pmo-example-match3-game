@@ -25,8 +25,7 @@ export class InputHandler {
    * 이벤트 리스너 설정
    */
   private setupListeners(): void {
-    // 마우스/터치 이벤트
-    this.container.eventMode = 'static';
+    // gridContainer에 이벤트 리스너 등록
     this.container.on('pointerdown', this.onPointerDown.bind(this));
     this.container.on('pointerup', this.onPointerUp.bind(this));
     this.container.on('pointermove', this.onPointerMove.bind(this));
@@ -219,7 +218,7 @@ export class InputHandler {
    */
   disable(): void {
     this.container.eventMode = 'none';
-    this.clearSelection(); // 입력 비활성화 시 선택도 해제
+    this.clearSelection();
     Logger.debug('InputHandler disabled');
   }
 
@@ -227,7 +226,7 @@ export class InputHandler {
    * 입력 활성화
    */
   enable(): void {
-    this.container.eventMode = 'static';
+    this.container.eventMode = 'passive';
     Logger.debug('InputHandler enabled');
   }
 
