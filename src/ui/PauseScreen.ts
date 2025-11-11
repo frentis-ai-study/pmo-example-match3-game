@@ -143,6 +143,7 @@ export class PauseScreen {
    */
   show(): void {
     this.container.visible = true;
+    this.container.eventMode = 'static'; // 이벤트 활성화
     Logger.debug('PauseScreen shown');
   }
 
@@ -151,6 +152,7 @@ export class PauseScreen {
    */
   hide(): void {
     this.container.visible = false;
+    this.container.eventMode = 'none'; // 이벤트 차단
     Logger.debug('PauseScreen hidden');
   }
 

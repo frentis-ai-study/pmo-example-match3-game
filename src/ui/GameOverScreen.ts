@@ -185,6 +185,7 @@ export class GameOverScreen {
   show(finalScore: number): void {
     this.setFinalScore(finalScore);
     this.container.visible = true;
+    this.container.eventMode = 'static'; // 이벤트 활성화
     Logger.info('GameOverScreen shown', { finalScore });
   }
 
@@ -193,6 +194,7 @@ export class GameOverScreen {
    */
   hide(): void {
     this.container.visible = false;
+    this.container.eventMode = 'none'; // 이벤트 차단
     Logger.debug('GameOverScreen hidden');
   }
 

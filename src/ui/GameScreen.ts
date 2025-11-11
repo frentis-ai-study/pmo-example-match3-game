@@ -82,6 +82,9 @@ export class GameScreen {
     this.setupUI();
     this.setupScreenCallbacks();
 
+    // 시작 화면에서는 게임 입력 비활성화
+    this.inputHandler.disable();
+
     Logger.info('GameScreen initialized');
   }
 
