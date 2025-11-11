@@ -14,15 +14,26 @@ export class Renderer {
   private gridPadding: number = 10;
   private selectionHighlight: Graphics | null = null;
 
-  // 블록 색상 매핑
+  // 블록 이모지 매핑
+  private blockEmojis: Record<BlockType, string> = {
+    red: '🍎',
+    blue: '🫐',
+    green: '🍏',
+    yellow: '🍋',
+    purple: '🍇',
+    orange: '🍊',
+    pink: '🍒',
+  };
+
+  // 블록 배경색 (이모지 뒤 배경)
   private blockColors: Record<BlockType, number> = {
-    red: 0xff4444,
-    blue: 0x4444ff,
-    green: 0x44ff44,
-    yellow: 0xffff44,
-    purple: 0xff44ff,
-    orange: 0xffaa44,
-    pink: 0xffaade,
+    red: 0xff6b6b,
+    blue: 0x4e89ff,
+    green: 0x51cf66,
+    yellow: 0xffd43b,
+    purple: 0xcc5de8,
+    orange: 0xff922b,
+    pink: 0xff6b9d,
   };
 
   constructor(app: Application) {
@@ -76,30 +87,51 @@ export class Renderer {
     const x = col * (this.blockSize + this.gridPadding);
     const y = row * (this.blockSize + this.gridPadding);
 
-    const block = new Graphics();
+    // 블록 컨테이너
+    const blockContainer = new Container();
+    blockContainer.x = x;
+    blockContainer.y = y;
 
-    // 블록 배경 (둥근 사각형)
-    block.beginFill(this.blockColors[type]);
-    block.drawRoundedRect(0, 0, this.blockSize, this.blockSize, 8);
-    block.endFill();
+    // 블록 배경 (둥근 사각형 + 그림자 효과)
+    const background = new Graphics();
 
-    // 블록 테두리 (하이라이트 효과)
-    block.lineStyle(2, 0xffffff, 0.3);
-    block.drawRoundedRect(2, 2, this.blockSize - 4, this.blockSize - 4, 6);
+    // 그림자
+    background.beginFill(0x000000, 0.2);
+    background.drawRoundedRect(2, 2, this.blockSize, this.blockSize, 12);
+    background.endFill();
 
-    block.x = x;
-    block.y = y;
+    // 메인 배경
+    background.beginFill(this.blockColors[type]);
+    background.drawRoundedRect(0, 0, this.blockSize, this.blockSize, 12);
+    background.endFill();
+
+    // 하이라이트 효과 (상단)
+    background.beginFill(0xffffff, 0.3);
+    background.drawRoundedRect(4, 4, this.blockSize - 8, this.blockSize / 2 - 4, 8);
+    background.endFill();
+
+    blockContainer.addChild(background);
+
+    // 이모지 텍스트
+    const emoji = new Text(this.blockEmojis[type], {
+      fontSize: 36,
+      align: 'center',
+    });
+    emoji.anchor.set(0.5);
+    emoji.x = this.blockSize / 2;
+    emoji.y = this.blockSize / 2;
+    blockContainer.addChild(emoji);
 
     // 인터랙티브 설정 (클릭 가능)
-    block.eventMode = 'static';
-    block.cursor = 'pointer';
+    blockContainer.eventMode = 'static';
+    blockContainer.cursor = 'pointer';
 
     // 데이터 저장 (나중에 입력 처리에 사용)
-    (block as any).blockRow = row;
-    (block as any).blockCol = col;
-    (block as any).blockType = type;
+    (blockContainer as any).blockRow = row;
+    (blockContainer as any).blockCol = col;
+    (blockContainer as any).blockType = type;
 
-    this.gridContainer.addChild(block);
+    this.gridContainer.addChild(blockContainer);
   }
 
   /**
@@ -110,9 +142,15 @@ export class Renderer {
     const y = row * (this.blockSize + this.gridPadding);
 
     const slot = new Graphics();
-    slot.beginFill(0x222222, 0.3);
-    slot.drawRoundedRect(0, 0, this.blockSize, this.blockSize, 8);
+
+    // 어두운 배경
+    slot.beginFill(0x1a1f3a, 0.5);
+    slot.drawRoundedRect(0, 0, this.blockSize, this.blockSize, 12);
     slot.endFill();
+
+    // 테두리
+    slot.lineStyle(1, 0x2d3561, 0.8);
+    slot.drawRoundedRect(1, 1, this.blockSize - 2, this.blockSize - 2, 11);
 
     slot.x = x;
     slot.y = y;

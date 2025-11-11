@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Match-3 puzzle game" />
-    <title>Match-3 Game</title>
+    <meta name="description" content="Fruit Match - Modern Match-3 puzzle game" />
+    <title>🍎 Fruit Match - Match-3 Game 🍇</title>
     <style>
       * {
         margin: 0;
@@ -14,12 +14,26 @@
 
       body {
         font-family: 'Arial', sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+        background-size: 200% 200%;
+        animation: gradientShift 15s ease infinite;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         overflow: hidden;
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
       }
 
       #app {
@@ -33,8 +47,15 @@
 
       canvas {
         display: block;
-        border-radius: 8px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border-radius: 16px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        transition: transform 0.2s ease;
+      }
+
+      canvas:hover {
+        transform: scale(1.01);
       }
     </style>
   </head>

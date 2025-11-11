@@ -34,6 +34,7 @@ export class GameScreen {
   private scoreText: Text | null = null;
   private pauseButton: Text | null = null;
   private movesText: Text | null = null;
+  private titleText: Text | null = null;
   private isProcessing: boolean = false;
 
   constructor(app: Application) {
@@ -112,24 +113,74 @@ export class GameScreen {
    * UI 설정
    */
   private setupUI(): void {
-    // 점수 표시
-    this.scoreText = this.renderer.renderText('Score: 0', 20, 20, 32);
+    // 타이틀
+    this.titleText = new Text('🍎 Fruit Match 🍇', {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: 48,
+      fontWeight: 'bold',
+      fill: [0xffffff, 0xffd93d],
+      stroke: { color: 0x2a2e5f, width: 4 },
+      dropShadow: {
+        color: 0x000000,
+        angle: Math.PI / 6,
+        blur: 4,
+        distance: 6,
+        alpha: 0.5,
+      },
+    });
+    this.titleText.anchor.set(0.5, 0);
+    this.titleText.x = this.app.screen.width / 2;
+    this.titleText.y = 20;
+    this.renderer.getUIContainer().addChild(this.titleText);
 
-    // 이동 횟수 표시
-    this.movesText = this.renderer.renderText('Moves: 0', 20, 60, 24);
+    // 점수 표시 (왼쪽 상단)
+    this.scoreText = new Text('💎 0', {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: 28,
+      fontWeight: 'bold',
+      fill: 0xffd93d,
+      stroke: { color: 0x2a2e5f, width: 3 },
+    });
+    this.scoreText.x = 20;
+    this.scoreText.y = 90;
+    this.renderer.getUIContainer().addChild(this.scoreText);
 
-    // 일시정지 버튼
-    this.pauseButton = this.renderer.renderText(
-      'Pause',
-      this.app.screen.width - 100,
-      20,
-      28
-    );
+    // 이동 횟수 표시 (왼쪽)
+    this.movesText = new Text('👆 0', {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: 24,
+      fontWeight: 'bold',
+      fill: 0xffffff,
+      stroke: { color: 0x2a2e5f, width: 2 },
+    });
+    this.movesText.x = 20;
+    this.movesText.y = 130;
+    this.renderer.getUIContainer().addChild(this.movesText);
+
+    // 일시정지 버튼 (오른쪽 상단)
+    this.pauseButton = new Text('⏸️ Pause', {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: 24,
+      fontWeight: 'bold',
+      fill: 0xffffff,
+      stroke: { color: 0x2a2e5f, width: 2 },
+    });
+    this.pauseButton.anchor.set(1, 0);
+    this.pauseButton.x = this.app.screen.width - 20;
+    this.pauseButton.y = 90;
     this.pauseButton.eventMode = 'static';
     this.pauseButton.cursor = 'pointer';
     this.pauseButton.on('pointerdown', () => {
       this.togglePause();
     });
+    // 호버 효과
+    this.pauseButton.on('pointerover', () => {
+      this.pauseButton!.scale.set(1.1);
+    });
+    this.pauseButton.on('pointerout', () => {
+      this.pauseButton!.scale.set(1);
+    });
+    this.renderer.getUIContainer().addChild(this.pauseButton);
   }
 
   /**
@@ -334,7 +385,7 @@ export class GameScreen {
    */
   private updateScoreDisplay(score: number): void {
     if (this.scoreText) {
-      this.scoreText.text = `Score: ${score}`;
+      this.scoreText.text = `💎 ${score}`;
     }
   }
 
@@ -343,7 +394,7 @@ export class GameScreen {
    */
   private updateMovesDisplay(moves: number): void {
     if (this.movesText) {
-      this.movesText.text = `Moves: ${moves}`;
+      this.movesText.text = `👆 ${moves}`;
     }
   }
 

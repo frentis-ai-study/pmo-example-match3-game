@@ -17,8 +17,8 @@ async function main() {
     // PixiJS 초기화
     await app.init({
       width: 800,
-      height: 700,
-      backgroundColor: 0x1a1a2e,
+      height: 750,
+      backgroundColor: 0x0a0e27,
       antialias: true,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
