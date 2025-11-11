@@ -2,14 +2,13 @@ import { Container, Graphics, Text } from 'pixi.js';
 import Logger from '../utils/Logger';
 
 /**
- * GameOverScreen
- * 게임 오버 화면을 표시합니다.
+ * StartScreen
+ * 게임 시작 화면을 표시합니다.
  */
-export class GameOverScreen {
+export class StartScreen {
   private container: Container;
   private overlay: Graphics;
-  private scoreText: Text | null = null;
-  private onRestartCallback: (() => void) | null = null;
+  private onPlayCallback: (() => void) | null = null;
 
   constructor(width: number, height: number) {
     this.container = new Container();
@@ -18,7 +17,7 @@ export class GameOverScreen {
     this.createOverlay(width, height);
     this.createUI(width, height);
 
-    Logger.info('GameOverScreen created');
+    Logger.info('StartScreen created');
   }
 
   /**
@@ -36,19 +35,19 @@ export class GameOverScreen {
    * UI 요소 생성
    */
   private createUI(width: number, height: number): void {
-    // 제목
+    // 게임 타이틀
     const title = new Text({
-      text: '🎮 게임 종료',
+      text: '🍎 Fruit Match 🍇',
       style: {
         fontFamily: 'Arial, sans-serif',
-        fontSize: 64,
-        fill: 0xffd93d,
+        fontSize: 72,
         fontWeight: 'bold',
-        stroke: { color: 0x2a2e5f, width: 5 },
+        fill: 0xffd93d,
+        stroke: { color: 0x2a2e5f, width: 6 },
         dropShadow: {
           color: 0x000000,
           angle: Math.PI / 6,
-          blur: 6,
+          blur: 4,
           distance: 8,
           alpha: 0.7,
         },
@@ -56,47 +55,50 @@ export class GameOverScreen {
     });
     title.anchor.set(0.5);
     title.x = width / 2;
-    title.y = height / 2 - 160;
+    title.y = height / 2 - 150;
     this.container.addChild(title);
 
-    // 격려 메시지
-    const message = new Text({
-      text: '수고하셨습니다! 🎉',
+    // 게임 설명
+    const instructions = new Text({
+      text: '🎮 같은 과일을 3개 이상 연결하세요!\n\n' +
+            '💡 드래그하거나 클릭-클릭으로 블록을 교환하세요\n' +
+            '⭐ 연쇄 콤보로 높은 점수를 획득하세요',
       style: {
         fontFamily: 'Arial, sans-serif',
-        fontSize: 28,
+        fontSize: 24,
         fill: 0xffffff,
-        fontWeight: 'normal',
+        align: 'center',
+        lineHeight: 36,
       },
     });
-    message.anchor.set(0.5);
-    message.x = width / 2;
-    message.y = height / 2 - 90;
-    this.container.addChild(message);
+    instructions.anchor.set(0.5);
+    instructions.x = width / 2;
+    instructions.y = height / 2 - 20;
+    this.container.addChild(instructions);
 
-    // 점수 표시
-    this.scoreText = new Text({
-      text: '💎 최종 점수: 0',
-      style: {
-        fontFamily: 'Arial, sans-serif',
-        fontSize: 48,
-        fill: 0xffd93d,
-        fontWeight: 'bold',
-        stroke: { color: 0x2a2e5f, width: 4 },
-      },
-    });
-    this.scoreText.anchor.set(0.5);
-    this.scoreText.x = width / 2;
-    this.scoreText.y = height / 2 - 10;
-    this.container.addChild(this.scoreText);
-
-    // 재시작 버튼
-    const restartButton = this.createButton('🔄  다시 시작하기', width / 2, height / 2 + 90, () => {
-      if (this.onRestartCallback) {
-        this.onRestartCallback();
+    // 플레이 버튼
+    const playButton = this.createButton('▶️  시작하기', width / 2, height / 2 + 120, () => {
+      if (this.onPlayCallback) {
+        this.onPlayCallback();
       }
     });
-    this.container.addChild(restartButton);
+    this.container.addChild(playButton);
+
+    // 프로젝트 정보
+    const projectInfo = new Text({
+      text: '한국PMO협회 PMO 전문가과정\n"바이브 코딩 시대의 SDLC 혁신 전략" 데모',
+      style: {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: 16,
+        fill: 0xaaaaaa,
+        align: 'center',
+        lineHeight: 24,
+      },
+    });
+    projectInfo.anchor.set(0.5);
+    projectInfo.x = width / 2;
+    projectInfo.y = height - 60;
+    this.container.addChild(projectInfo);
   }
 
   /**
@@ -113,16 +115,16 @@ export class GameOverScreen {
     // 버튼 배경
     const bg = new Graphics();
     bg.beginFill(0x4caf50); // 녹색 버튼
-    bg.drawRoundedRect(-140, -30, 280, 60, 15);
+    bg.drawRoundedRect(-120, -30, 240, 60, 15);
     bg.endFill();
 
     // 버튼 테두리
     bg.lineStyle(3, 0xffffff, 0.8);
-    bg.drawRoundedRect(-140, -30, 280, 60, 15);
+    bg.drawRoundedRect(-120, -30, 240, 60, 15);
 
     // 하이라이트 효과
     bg.beginFill(0xffffff, 0.2);
-    bg.drawRoundedRect(-135, -25, 270, 25, 12);
+    bg.drawRoundedRect(-115, -25, 230, 25, 12);
     bg.endFill();
 
     button.addChild(bg);
@@ -164,28 +166,18 @@ export class GameOverScreen {
   }
 
   /**
-   * 최종 점수 설정
+   * 플레이 콜백 등록
    */
-  setFinalScore(score: number): void {
-    if (this.scoreText) {
-      this.scoreText.text = `💎 최종 점수: ${score}`;
-    }
-  }
-
-  /**
-   * 재시작 콜백 등록
-   */
-  onRestart(callback: () => void): void {
-    this.onRestartCallback = callback;
+  onPlay(callback: () => void): void {
+    this.onPlayCallback = callback;
   }
 
   /**
    * 화면 표시
    */
-  show(finalScore: number): void {
-    this.setFinalScore(finalScore);
+  show(): void {
     this.container.visible = true;
-    Logger.info('GameOverScreen shown', { finalScore });
+    Logger.debug('StartScreen shown');
   }
 
   /**
@@ -193,7 +185,7 @@ export class GameOverScreen {
    */
   hide(): void {
     this.container.visible = false;
-    Logger.debug('GameOverScreen hidden');
+    Logger.debug('StartScreen hidden');
   }
 
   /**
@@ -208,6 +200,6 @@ export class GameOverScreen {
    */
   destroy(): void {
     this.container.destroy({ children: true });
-    Logger.info('GameOverScreen destroyed');
+    Logger.info('StartScreen destroyed');
   }
 }

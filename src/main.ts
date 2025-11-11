@@ -36,11 +36,10 @@ async function main() {
       height: app.screen.height,
     });
 
-    // GameScreen 생성 및 시작
+    // GameScreen 생성 (시작 화면이 자동으로 표시됨)
     const gameScreen = new GameScreen(app);
-    gameScreen.start();
 
-    Logger.info('Game started successfully');
+    Logger.info('Game initialized successfully');
 
     // 전역 변수로 노출 (디버깅용)
     (window as any).gameScreen = gameScreen;

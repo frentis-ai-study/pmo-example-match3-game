@@ -6,6 +6,7 @@ import { ScoreCalculator } from '../game/ScoreCalculator';
 import { Renderer } from '../rendering/Renderer';
 import { AnimationController } from '../rendering/AnimationController';
 import { InputHandler } from '../rendering/InputHandler';
+import { StartScreen } from './StartScreen';
 import { PauseScreen } from './PauseScreen';
 import { GameOverScreen } from './GameOverScreen';
 import { ComboCounter } from './ComboCounter';
@@ -28,6 +29,7 @@ export class GameScreen {
   private renderer: Renderer;
   private animationController: AnimationController;
   private inputHandler: InputHandler;
+  private startScreen: StartScreen;
   private pauseScreen: PauseScreen;
   private gameOverScreen: GameOverScreen;
   private comboCounter: ComboCounter;
@@ -60,16 +62,19 @@ export class GameScreen {
     );
 
     // UI 화면 초기화
+    this.startScreen = new StartScreen(app.screen.width, app.screen.height);
     this.pauseScreen = new PauseScreen(app.screen.width, app.screen.height);
     this.gameOverScreen = new GameOverScreen(app.screen.width, app.screen.height);
     this.comboCounter = new ComboCounter(app.screen.width / 2, app.screen.height / 2 - 150);
 
     // UI 컨테이너에 추가
+    app.stage.addChild(this.startScreen.getContainer());
     app.stage.addChild(this.pauseScreen.getContainer());
     app.stage.addChild(this.gameOverScreen.getContainer());
     app.stage.addChild(this.comboCounter.getContainer());
 
-    // 초기에는 숨김
+    // 초기에는 시작 화면만 표시
+    this.startScreen.show();
     this.pauseScreen.hide();
     this.gameOverScreen.hide();
 
@@ -116,7 +121,7 @@ export class GameScreen {
     // 타이틀
     this.titleText = new Text('🍎 Fruit Match 🍇', {
       fontFamily: 'Arial, sans-serif',
-      fontSize: 48,
+      fontSize: 42,
       fontWeight: 'bold',
       fill: 0xffd93d,
       stroke: { color: 0x2a2e5f, width: 4 },
@@ -130,44 +135,44 @@ export class GameScreen {
     });
     this.titleText.anchor.set(0.5, 0);
     this.titleText.x = this.app.screen.width / 2;
-    this.titleText.y = 20;
+    this.titleText.y = 15;
     this.renderer.getUIContainer().addChild(this.titleText);
 
     // 점수 표시 (왼쪽 상단)
     this.scoreText = new Text('💎 0', {
       fontFamily: 'Arial, sans-serif',
-      fontSize: 28,
+      fontSize: 26,
       fontWeight: 'bold',
       fill: 0xffd93d,
       stroke: { color: 0x2a2e5f, width: 3 },
     });
-    this.scoreText.x = 20;
-    this.scoreText.y = 90;
+    this.scoreText.x = 25;
+    this.scoreText.y = 75;
     this.renderer.getUIContainer().addChild(this.scoreText);
 
     // 이동 횟수 표시 (왼쪽)
     this.movesText = new Text('👆 0', {
       fontFamily: 'Arial, sans-serif',
-      fontSize: 24,
+      fontSize: 22,
       fontWeight: 'bold',
       fill: 0xffffff,
       stroke: { color: 0x2a2e5f, width: 2 },
     });
-    this.movesText.x = 20;
-    this.movesText.y = 130;
+    this.movesText.x = 25;
+    this.movesText.y = 115;
     this.renderer.getUIContainer().addChild(this.movesText);
 
     // 일시정지 버튼 (오른쪽 상단)
     this.pauseButton = new Text('⏸️ Pause', {
       fontFamily: 'Arial, sans-serif',
-      fontSize: 24,
+      fontSize: 22,
       fontWeight: 'bold',
       fill: 0xffffff,
       stroke: { color: 0x2a2e5f, width: 2 },
     });
     this.pauseButton.anchor.set(1, 0);
-    this.pauseButton.x = this.app.screen.width - 20;
-    this.pauseButton.y = 90;
+    this.pauseButton.x = this.app.screen.width - 25;
+    this.pauseButton.y = 75;
     this.pauseButton.eventMode = 'static';
     this.pauseButton.cursor = 'pointer';
     this.pauseButton.on('pointerdown', () => {
@@ -187,6 +192,12 @@ export class GameScreen {
    * 화면 콜백 설정
    */
   private setupScreenCallbacks(): void {
+    // 시작 화면 콜백
+    this.startScreen.onPlay(() => {
+      this.startScreen.hide();
+      this.start();
+    });
+
     // 일시정지 화면 콜백
     this.pauseScreen.onResume(() => {
       this.resume();
@@ -235,6 +246,8 @@ export class GameScreen {
 
     this.renderGame();
     this.updateScoreDisplay(this.gameState.score);
+    this.updateMovesDisplay(this.gameState.moves);
+    this.inputHandler.enable();
 
     Logger.info('Game started');
   }
@@ -448,8 +461,8 @@ export class GameScreen {
     // 저장된 게임 상태 삭제
     StorageManager.clear();
 
-    this.renderGame();
-    this.start();
+    // 시작 화면 표시
+    this.startScreen.show();
 
     Logger.info('Game restarted');
   }
@@ -488,6 +501,7 @@ export class GameScreen {
   destroy(): void {
     this.inputHandler.destroy();
     this.renderer.destroy();
+    this.startScreen.destroy();
     this.pauseScreen.destroy();
     this.gameOverScreen.destroy();
     this.comboCounter.destroy();
