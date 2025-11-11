@@ -1,11 +1,43 @@
 import { Application } from 'pixi.js';
 import Logger from './utils/Logger';
-import { GameScreen } from './ui/GameScreen';
+import { Scene } from './scenes/Scene';
+import { StartScene } from './scenes/StartScene';
+import { GameScene } from './scenes/GameScene';
 
 /**
  * 게임 메인 진입점
- * PixiJS Application을 초기화하고 게임을 시작합니다.
+ * Scene Manager 패턴으로 시작 화면과 게임 화면을 관리합니다.
  */
+
+class SceneManager {
+  private app: Application;
+  private currentScene: Scene | null = null;
+
+  constructor(app: Application) {
+    this.app = app;
+  }
+
+  switchTo(SceneClass: typeof Scene): Scene {
+    // 기존 씬 정리
+    if (this.currentScene) {
+      this.currentScene.destroy();
+    }
+
+    // 새 씬 생성 및 시작
+    const newScene = new (SceneClass as any)(this.app) as Scene;
+    newScene.init();
+    newScene.start();
+    this.currentScene = newScene;
+
+    Logger.info(`Switched to ${SceneClass.name}`);
+
+    return newScene;
+  }
+
+  getCurrentScene(): Scene | null {
+    return this.currentScene;
+  }
+}
 
 async function main() {
   Logger.info('Game initializing...');
@@ -36,13 +68,22 @@ async function main() {
       height: app.screen.height,
     });
 
-    // GameScreen 생성 (시작 화면이 자동으로 표시됨)
-    const gameScreen = new GameScreen(app);
+    // Scene Manager 생성
+    const sceneManager = new SceneManager(app);
+
+    // 시작 화면 표시
+    const startScene = sceneManager.switchTo(StartScene) as StartScene;
+
+    // 시작 버튼 클릭 시 게임 화면으로 전환
+    startScene.onStart(() => {
+      Logger.info('Starting game...');
+      sceneManager.switchTo(GameScene);
+    });
 
     Logger.info('Game initialized successfully');
 
     // 전역 변수로 노출 (디버깅용)
-    (window as any).gameScreen = gameScreen;
+    (window as any).sceneManager = sceneManager;
   } catch (error) {
     Logger.error('Failed to initialize game', error);
     throw error;
