@@ -1,4 +1,4 @@
-import type { Container, Graphics } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import type { Position } from '../types';
 import { DEFAULT_GAME_CONFIG } from '../types';
 import Logger from '../utils/Logger';
@@ -121,16 +121,19 @@ export class AnimationController {
   }
 
   /**
-   * 블록 제거 애니메이션 (페이드아웃 + 스케일)
+   * 블록 제거 애니메이션 (페이드아웃 + 스케일 + 파티클 이펙트)
    */
   async animateRemove(positions: Position[]): Promise<void> {
     const blocks = positions
       .map((pos) => this.findBlockAt(pos))
-      .filter((block) => block !== null) as Graphics[];
+      .filter((block) => block !== null) as Container[];
 
     if (blocks.length === 0) {
       return;
     }
+
+    // 각 블록 위치에 파티클 생성
+    const particles = blocks.map((block) => this.createParticles(block.x, block.y));
 
     return new Promise((resolve) => {
       const startTime = Date.now();
@@ -143,9 +146,21 @@ export class AnimationController {
         // Ease-out
         const eased = 1 - Math.pow(1 - progress, 3);
 
+        // 블록 애니메이션
         blocks.forEach((block) => {
           block.alpha = 1 - eased;
-          block.scale.set(1 - eased * 0.5);
+          block.scale.set(1 + eased * 0.3); // 커지면서 사라지기
+        });
+
+        // 파티클 애니메이션
+        particles.forEach((particleGroup) => {
+          particleGroup.forEach((particle: any) => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.vy += 0.5; // 중력 효과
+            particle.alpha = 1 - eased;
+            particle.scale.set(particle.scale.x * 0.95);
+          });
         });
 
         if (progress < 1) {
@@ -155,12 +170,51 @@ export class AnimationController {
           blocks.forEach((block) => {
             block.destroy();
           });
+          // 파티클 제거
+          particles.forEach((particleGroup) => {
+            particleGroup.forEach((particle: any) => {
+              particle.destroy();
+            });
+          });
           resolve();
         }
       };
 
       animate();
     });
+  }
+
+  /**
+   * 파티클 생성 (반짝이는 별 효과)
+   */
+  private createParticles(x: number, y: number): Graphics[] {
+    const particles: Graphics[] = [];
+    const particleCount = 8;
+    const centerX = x + this.blockSize / 2;
+    const centerY = y + this.blockSize / 2;
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = new Graphics();
+
+      // 별 모양
+      particle.beginFill(0xffff00, 1);
+      particle.drawStar(0, 0, 5, 4, 2);
+      particle.endFill();
+
+      particle.x = centerX;
+      particle.y = centerY;
+
+      // 랜덤한 방향으로 날아가기
+      const angle = (Math.PI * 2 * i) / particleCount;
+      const speed = 2 + Math.random() * 2;
+      (particle as any).vx = Math.cos(angle) * speed;
+      (particle as any).vy = Math.sin(angle) * speed - 2; // 위로 튀어오르기
+
+      this.container.addChild(particle);
+      particles.push(particle);
+    }
+
+    return particles;
   }
 
   /**
