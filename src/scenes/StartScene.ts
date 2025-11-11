@@ -14,8 +14,11 @@ export class StartScene extends Scene {
   }
 
   init(): void {
+    console.log('===== StartScene.init() CALLED =====');
     const width = this.app.screen.width;
     const height = this.app.screen.height;
+
+    console.log('Screen dimensions:', { width, height });
 
     // 배경
     const bg = new Graphics();
@@ -24,6 +27,8 @@ export class StartScene extends Scene {
     bg.endFill();
     bg.eventMode = 'none';
     this.container.addChild(bg);
+
+    console.log('Background added:', { eventMode: bg.eventMode });
 
     // 타이틀
     const title = new Text({
@@ -68,7 +73,14 @@ export class StartScene extends Scene {
 
     // 시작 버튼
     const startButton = this.createButton('▶️  시작하기', width / 2, height / 2 + 120);
+    console.log('Start button created:', {
+      x: startButton.x,
+      y: startButton.y,
+      eventMode: startButton.eventMode,
+      cursor: startButton.cursor
+    });
     this.container.addChild(startButton);
+    console.log('Start button added to container');
 
     // 프로젝트 정보
     const info = new Text({
@@ -85,6 +97,13 @@ export class StartScene extends Scene {
     info.x = width / 2;
     info.y = height - 60;
     this.container.addChild(info);
+
+    console.log('===== StartScene.init() COMPLETE =====');
+    console.log('Container state:', {
+      children: this.container.children.length,
+      visible: this.container.visible,
+      eventMode: this.container.eventMode
+    });
 
     Logger.info('StartScene initialized');
   }
@@ -124,7 +143,10 @@ export class StartScene extends Scene {
     button.eventMode = 'static';
     button.cursor = 'pointer';
 
+    console.log('Setting up button events...');
+
     button.on('pointerdown', () => {
+      console.log('***** BUTTON POINTERDOWN *****');
       Logger.info('Start button clicked');
       if (this.onStartCallback) {
         this.onStartCallback();
@@ -132,14 +154,18 @@ export class StartScene extends Scene {
     });
 
     button.on('pointerover', () => {
+      console.log('***** BUTTON HOVER *****');
       button.scale.set(1.05);
       bg.tint = 0xddffdd;
     });
 
     button.on('pointerout', () => {
+      console.log('***** BUTTON HOVER OUT *****');
       button.scale.set(1);
       bg.tint = 0xffffff;
     });
+
+    console.log('Button events registered');
 
     return button;
   }

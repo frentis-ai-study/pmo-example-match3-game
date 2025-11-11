@@ -11,6 +11,8 @@ export abstract class Scene {
   constructor(app: Application) {
     this.app = app;
     this.container = new Container();
+    // 컨테이너는 이벤트를 받지 않도록 (자식들만 이벤트 처리)
+    this.container.eventMode = 'none';
   }
 
   /**
@@ -22,7 +24,17 @@ export abstract class Scene {
    * 씬 시작 (화면에 표시)
    */
   start(): void {
+    console.log(`===== ${this.constructor.name}.start() =====`);
+    console.log('Container before adding to stage:', {
+      visible: this.container.visible,
+      eventMode: this.container.eventMode,
+      children: this.container.children.length
+    });
+
     this.app.stage.addChild(this.container);
+
+    console.log('Container added to stage');
+    console.log('Stage children count:', this.app.stage.children.length);
   }
 
   /**
