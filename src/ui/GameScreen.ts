@@ -233,6 +233,8 @@ export class GameScreen {
    * 게임 시작
    */
   start(): void {
+    Logger.debug('start() method called');
+
     // 저장된 게임 상태 확인
     if (StorageManager.hasSave()) {
       const savedState = StorageManager.load();
@@ -245,9 +247,13 @@ export class GameScreen {
 
     if (this.gameState.phase === 'idle') {
       this.gameState.start();
+      Logger.debug('GameState started');
     }
 
+    Logger.debug('About to render game');
     this.renderGame();
+    Logger.debug('Game rendered');
+
     this.updateScoreDisplay(this.gameState.score);
     this.updateMovesDisplay(this.gameState.moves);
     this.inputHandler.enable();

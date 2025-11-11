@@ -88,6 +88,7 @@ export class PauseScreen {
     bg.setStrokeStyle({ width: 2, color: 0xffffff });
     bg.drawRoundedRect(-100, -25, 200, 50, 10);
 
+    bg.eventMode = 'none'; // 배경은 이벤트를 받지 않도록
     button.addChild(bg);
 
     // 버튼 텍스트
@@ -101,6 +102,7 @@ export class PauseScreen {
       },
     });
     buttonText.anchor.set(0.5);
+    buttonText.eventMode = 'none'; // 텍스트는 이벤트를 받지 않도록
     button.addChild(buttonText);
 
     button.x = x;

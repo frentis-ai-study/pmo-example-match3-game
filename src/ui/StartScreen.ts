@@ -78,8 +78,12 @@ export class StartScreen {
 
     // 플레이 버튼
     const playButton = this.createButton('▶️  시작하기', width / 2, height / 2 + 120, () => {
+      Logger.debug('Play button clicked');
       if (this.onPlayCallback) {
+        Logger.debug('Calling onPlayCallback');
         this.onPlayCallback();
+      } else {
+        Logger.warn('onPlayCallback is null');
       }
     });
     this.container.addChild(playButton);
@@ -127,6 +131,7 @@ export class StartScreen {
     bg.drawRoundedRect(-115, -25, 230, 25, 12);
     bg.endFill();
 
+    bg.eventMode = 'none'; // 배경은 이벤트를 받지 않도록
     button.addChild(bg);
 
     // 버튼 텍스트
@@ -140,6 +145,7 @@ export class StartScreen {
       },
     });
     buttonText.anchor.set(0.5);
+    buttonText.eventMode = 'none'; // 텍스트는 이벤트를 받지 않도록
     button.addChild(buttonText);
 
     button.x = x;
