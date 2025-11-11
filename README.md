@@ -1,6 +1,26 @@
 # Match-3 Game Core
 
-PixiJS v8를 사용한 Match-3 퍼즐 게임입니다. 애니팡과 유사한 블록 매칭 메커니즘을 구현했습니다.
+[![Deploy to GitHub Pages](https://github.com/frentis-ai-study/pmo-example-match3-game/actions/workflows/deploy.yml/badge.svg)](https://github.com/frentis-ai-study/pmo-example-match3-game/actions/workflows/deploy.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![PixiJS](https://img.shields.io/badge/PixiJS-v8.14.0-e91e63.svg)](https://pixijs.com/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![pnpm](https://img.shields.io/badge/pnpm-8.x-orange.svg)](https://pnpm.io/)
+
+**🎮 [게임 플레이하기](https://frentis-ai-study.github.io/pmo-example-match3-game/)**
+
+## 프로젝트 소개
+
+이 프로젝트는 **한국PMO협회 PMO 전문가과정 "바이브 코딩 시대의 SDLC 혁신 전략"**의 데모 프로젝트입니다.
+
+AI 기반 개발 도구(Claude Code)와 Specification-Driven Development를 활용하여 Match-3 퍼즐 게임을 구현했습니다.
+PixiJS v8를 사용한 WebGL 렌더링과 애니팡과 유사한 블록 매칭 메커니즘을 포함합니다.
+
+### 개발 방법론
+
+- **Specification-Driven Development**: 명확한 스펙 정의부터 시작
+- **AI Pair Programming**: Claude Code를 활용한 협업 개발
+- **Test-Driven Development**: 테스트 우선 접근
+- **Incremental Delivery**: 사용자 스토리별 점진적 구현
 
 ## 주요 기능
 
@@ -202,10 +222,57 @@ WebGL을 지원하는 모든 최신 브라우저에서 작동합니다.
 
 MIT License
 
-## 제작
+## 제작 정보
 
-이 프로젝트는 Specify 템플릿과 Claude Code를 사용하여 구현되었습니다.
+### 교육 프로그램
 
-- Specification 기반 개발
-- TDD (Test-Driven Development) 접근
-- 사용자 스토리별 점진적 구현
+이 프로젝트는 **한국PMO협회 PMO 전문가과정**의 일환으로 제작되었습니다.
+
+- **과정명**: "바이브 코딩 시대의 SDLC 혁신 전략"
+- **주관**: 한국PMO협회
+- **목적**: AI 기반 개발 도구를 활용한 소프트웨어 개발 프로세스 혁신 시연
+
+### 개발 프로세스
+
+이 프로젝트는 다음과 같은 현대적인 개발 방법론을 적용했습니다:
+
+1. **Specification 작성** (`/speckit.specify`)
+   - 자연어로 기능 설명
+   - AI가 구조화된 스펙 문서 생성
+
+2. **구현 계획 수립** (`/speckit.plan`)
+   - 기술 스택 선정 (PixiJS v8)
+   - 아키텍처 설계
+   - 리스크 분석
+
+3. **작업 분해** (`/speckit.tasks`)
+   - 61개의 세부 작업으로 분해
+   - 6개 Phase로 구조화
+   - 의존성 및 병렬 실행 계획
+
+4. **점진적 구현** (`/speckit.implement`)
+   - Phase 1-2: 프로젝트 Setup 및 인프라
+   - Phase 3: US1 - 기본 게임플레이 (MVP)
+   - Phase 4: US2 - 게임 세션 관리
+   - Phase 5: US3 - 진행상황 표시
+   - Phase 6: 테스트 및 문서화
+
+### 개발 도구
+
+- **AI Assistant**: Claude Code (Anthropic)
+- **Specification Framework**: Speckit
+- **Version Control**: Git + GitHub
+- **CI/CD**: GitHub Actions
+- **Deployment**: GitHub Pages
+
+### 성과
+
+- ✅ 6개 Phase 완료 (총 61개 작업)
+- ✅ 30개 E2E 테스트 통과 (Chromium, Firefox, WebKit)
+- ✅ 자동 배포 파이프라인 구축
+- ✅ 완전한 프로젝트 문서화
+- 📊 총 개발 시간: AI와 협업으로 대폭 단축
+
+---
+
+**💡 이 프로젝트는 AI 기반 개발 도구가 어떻게 소프트웨어 개발 프로세스를 혁신할 수 있는지 보여주는 실전 사례입니다.**
