@@ -118,7 +118,7 @@ export class GameScreen {
       fontFamily: 'Arial, sans-serif',
       fontSize: 48,
       fontWeight: 'bold',
-      fill: [0xffffff, 0xffd93d],
+      fill: 0xffd93d,
       stroke: { color: 0x2a2e5f, width: 4 },
       dropShadow: {
         color: 0x000000,
