@@ -122,10 +122,6 @@ export class Renderer {
     emoji.y = this.blockSize / 2;
     blockContainer.addChild(emoji);
 
-    // 인터랙티브 설정 (클릭 가능)
-    blockContainer.eventMode = 'static';
-    blockContainer.cursor = 'pointer';
-
     // 데이터 저장 (나중에 입력 처리에 사용)
     (blockContainer as any).blockRow = row;
     (blockContainer as any).blockCol = col;
