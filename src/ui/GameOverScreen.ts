@@ -29,6 +29,9 @@ export class GameOverScreen {
     this.overlay.drawRect(0, 0, width, height);
     this.overlay.endFill();
 
+    // 오버레이는 배경일 뿐이므로 이벤트를 받지 않도록
+    this.overlay.eventMode = 'none';
+
     this.container.addChild(this.overlay);
   }
 
