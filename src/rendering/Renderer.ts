@@ -41,6 +41,9 @@ export class Renderer {
     this.gridContainer = new Container();
     this.uiContainer = new Container();
 
+    // UI 컨테이너는 이벤트를 받지 않도록 (자식들만 이벤트 처리)
+    this.uiContainer.eventMode = 'none';
+
     this.app.stage.addChild(this.gridContainer);
     this.app.stage.addChild(this.uiContainer);
 

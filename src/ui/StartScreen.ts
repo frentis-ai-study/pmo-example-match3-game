@@ -81,14 +81,18 @@ export class StartScreen {
 
     // 플레이 버튼
     const playButton = this.createButton('▶️  시작하기', width / 2, height / 2 + 120, () => {
+      console.log('===== PLAY BUTTON CLICKED =====');
       Logger.debug('Play button clicked');
       if (this.onPlayCallback) {
+        console.log('Calling onPlayCallback');
         Logger.debug('Calling onPlayCallback');
         this.onPlayCallback();
       } else {
+        console.error('onPlayCallback is null!');
         Logger.warn('onPlayCallback is null');
       }
     });
+    console.log('Play button created and added to container');
     this.container.addChild(playButton);
 
     // 프로젝트 정보
@@ -158,15 +162,32 @@ export class StartScreen {
     button.eventMode = 'static';
     button.cursor = 'pointer';
 
-    button.on('pointerdown', onClick);
+    console.log('Button settings:', {
+      eventMode: button.eventMode,
+      cursor: button.cursor,
+      x, y
+    });
+
+    Logger.debug('Button created', { x, y, eventMode: button.eventMode });
+
+    button.on('pointerdown', () => {
+      console.log('***** BUTTON POINTERDOWN FIRED *****');
+      onClick();
+    });
+    console.log('pointerdown listener registered');
+    Logger.debug('pointerdown listener registered');
 
     // 호버 효과
     button.on('pointerover', () => {
+      console.log('***** BUTTON HOVER *****');
+      Logger.debug('Button hover');
       button.scale.set(1.05);
       bg.tint = 0xddffdd;
     });
 
     button.on('pointerout', () => {
+      console.log('***** BUTTON HOVER OUT *****');
+      Logger.debug('Button hover out');
       button.scale.set(1);
       bg.tint = 0xffffff;
     });
@@ -185,9 +206,21 @@ export class StartScreen {
    * 화면 표시
    */
   show(): void {
+    console.log('===== StartScreen.show() CALLED =====');
+    console.log('Before:', { visible: this.container.visible, eventMode: this.container.eventMode });
+
     this.container.visible = true;
     this.container.eventMode = 'static'; // 이벤트 활성화
-    Logger.debug('StartScreen shown');
+
+    console.log('After:', { visible: this.container.visible, eventMode: this.container.eventMode });
+    console.log('Container children:', this.container.children.length);
+    console.log('Overlay eventMode:', this.overlay.eventMode);
+
+    Logger.debug('StartScreen shown', {
+      containerVisible: this.container.visible,
+      containerEventMode: this.container.eventMode,
+      childrenCount: this.container.children.length
+    });
   }
 
   /**

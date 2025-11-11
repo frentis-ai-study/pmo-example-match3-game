@@ -85,6 +85,15 @@ export class GameScreen {
     // 시작 화면에서는 게임 입력 비활성화
     this.inputHandler.disable();
 
+    // 디버깅: stage children 순서 확인
+    console.log('===== STAGE CHILDREN ORDER =====');
+    app.stage.children.forEach((child, index) => {
+      console.log(`${index}: ${(child as any).constructor.name}`, {
+        visible: child.visible,
+        eventMode: child.eventMode
+      });
+    });
+
     Logger.info('GameScreen initialized');
   }
 
