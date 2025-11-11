@@ -82,7 +82,7 @@ export class AnimationController {
   }
 
   /**
-   * 블록 낙하 애니메이션
+   * 블록 낙하 애니메이션 (중력 + 바운스 효과)
    */
   async animateFall(from: Position, to: Position): Promise<void> {
     const block = this.findBlockAt(from);
@@ -93,6 +93,7 @@ export class AnimationController {
 
     const startY = block.y;
     const endY = to.row * (this.blockSize + this.gridPadding);
+    const distance = endY - startY;
 
     return new Promise((resolve) => {
       const startTime = Date.now();
@@ -102,14 +103,25 @@ export class AnimationController {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // Ease-in (중력 효과)
-        const eased = progress * progress;
+        // Ease-in-out with bounce (중력 + 바운스 효과)
+        let eased: number;
+        if (progress < 0.8) {
+          // 떨어지는 단계 (가속)
+          const t = progress / 0.8;
+          eased = t * t; // ease-in
+        } else {
+          // 바운스 단계
+          const t = (progress - 0.8) / 0.2;
+          eased = 1 - Math.abs(Math.sin(t * Math.PI)) * 0.1; // 작은 바운스
+        }
 
-        block.y = startY + (endY - startY) * eased;
+        block.y = startY + distance * eased;
 
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
+          // 최종 위치 보정
+          block.y = endY;
           (block as any).blockRow = to.row;
           (block as any).blockCol = to.col;
           resolve();

@@ -8,6 +8,7 @@ import Logger from '../utils/Logger';
 export class ComboCounter {
   private container: Container;
   private comboText: Text;
+  private hideTimer: number | null = null;
 
   constructor(x: number, y: number) {
     this.container = new Container();
@@ -37,6 +38,12 @@ export class ComboCounter {
    * 콤보 카운트 업데이트
    */
   update(comboCount: number): void {
+    // 기존 타이머 제거
+    if (this.hideTimer !== null) {
+      clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
+
     if (comboCount > 0) {
       this.comboText.text = `Combo x${comboCount}!`;
       this.show();
@@ -44,6 +51,12 @@ export class ComboCounter {
       // 애니메이션 효과
       this.comboText.scale.set(1.5);
       this.animateScale();
+
+      // 1.5초 후 자동으로 숨기기
+      this.hideTimer = window.setTimeout(() => {
+        this.hide();
+        this.hideTimer = null;
+      }, 1500);
     } else {
       this.hide();
     }
@@ -98,6 +111,10 @@ export class ComboCounter {
    * 정리
    */
   destroy(): void {
+    if (this.hideTimer !== null) {
+      clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
     this.container.destroy({ children: true });
     Logger.info('ComboCounter destroyed');
   }
